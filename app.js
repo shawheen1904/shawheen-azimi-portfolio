@@ -68,59 +68,75 @@
   if (!body || !input) return;
 
   const FILES = ['about.md', 'experience.json', 'skills.txt', 'certifications/', 'resume.pdf', 'blog.url', 'contact.sh'];
-  const escapeHTML = (value) => value.replace(/[&<>"']/g, ch => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-  }[ch]));
-  const print = (html, cls) => {
+  const appendRow = (parts, cls) => {
     const d = document.createElement('div');
     d.className = 't-row' + (cls ? ' ' + cls : '');
-    d.innerHTML = html;
+    parts.forEach(part => {
+      if (typeof part === 'string') {
+        d.append(document.createTextNode(part));
+        return;
+      }
+      const span = document.createElement('span');
+      span.className = part.cls;
+      span.textContent = part.text;
+      d.append(span);
+    });
     body.insertBefore(d, body.querySelector('.t-live'));
     body.scrollTop = body.scrollHeight;
   };
-  const echo = (cmd) => print(`<span class="t-prompt">shawheen@ai</span><span class="t-out">:</span><span class="t-path">~</span><span class="t-out">$</span> <span class="t-cmd">${escapeHTML(cmd)}</span>`);
+  const part = (cls, text) => ({ cls, text });
+  const promptParts = (cmd) => [
+    part('t-prompt', 'shawheen@ai'),
+    part('t-out', ':'),
+    part('t-path', '~'),
+    part('t-out', '$'),
+    ' ',
+    part('t-cmd', cmd),
+  ];
+  const echo = (cmd) => appendRow(promptParts(cmd));
 
   const scrollTo = (id) => { const el = $(id); if (el) el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); };
 
   const COMMANDS = {
-    help: () => print(
-      `<span class="t-out">available commands:</span>\n` +
-      `  <span class="t-key">about</span>       whoami / background\n` +
-      `  <span class="t-key">experience</span>  professional record\n` +
-      `  <span class="t-key">skills</span>      technical stack\n` +
-      `  <span class="t-key">certs</span>       certifications\n` +
-      `  <span class="t-key">resume</span>      download CV (pdf)\n` +
-      `  <span class="t-key">blog</span>        open the newsletter\n` +
-      `  <span class="t-key">contact</span>     get in touch\n` +
-      `  <span class="t-key">clear</span>       reset terminal`),
-    ls: () => print(FILES.map(f => `<span class="${f.endsWith('/') ? 't-path' : 't-out'}">${f}</span>`).join('   ')),
-    whoami: () => { print(`<span class="t-key">Shawheen Azimi</span> <span class="t-out">— Senior Security Architect, Engineer & Analyst</span>`); scrollTo('#about'); },
-    about: () => { print(`<span class="t-out">opening</span> <span class="t-path">about.md</span> <span class="t-out">…</span>`); scrollTo('#about'); },
-    experience: () => { print(`<span class="t-out">querying</span> <span class="t-path">experience.json</span> <span class="t-out">…</span>`); scrollTo('#experience'); },
+    help: () => appendRow([
+      part('t-out', 'available commands:'),
+      '\n  ', part('t-key', 'about'), '       whoami / background',
+      '\n  ', part('t-key', 'experience'), '  professional record',
+      '\n  ', part('t-key', 'skills'), '      technical stack',
+      '\n  ', part('t-key', 'certs'), '       certifications',
+      '\n  ', part('t-key', 'resume'), '      download CV (pdf)',
+      '\n  ', part('t-key', 'blog'), '        open the newsletter',
+      '\n  ', part('t-key', 'contact'), '     get in touch',
+      '\n  ', part('t-key', 'clear'), '       reset terminal',
+    ]),
+    ls: () => appendRow(FILES.flatMap((f, i) => [
+      ...(i ? ['   '] : []),
+      part(f.endsWith('/') ? 't-path' : 't-out', f),
+    ])),
+    whoami: () => { appendRow([part('t-key', 'Shawheen Azimi'), ' ', part('t-out', '— Senior Security Architect, Engineer & Analyst')]); scrollTo('#about'); },
+    about: () => { appendRow([part('t-out', 'opening'), ' ', part('t-path', 'about.md'), ' ', part('t-out', '…')]); scrollTo('#about'); },
+    experience: () => { appendRow([part('t-out', 'querying'), ' ', part('t-path', 'experience.json'), ' ', part('t-out', '…')]); scrollTo('#experience'); },
     exp: () => COMMANDS.experience(),
-    skills: () => { print(`<span class="t-out">loading</span> <span class="t-path">skills.txt</span> <span class="t-out">…</span>`); scrollTo('#skills'); },
-    certs: () => { print(`<span class="t-out">enumerating</span> <span class="t-path">certifications/</span> <span class="t-out">…</span>`); scrollTo('#certs'); },
+    skills: () => { appendRow([part('t-out', 'loading'), ' ', part('t-path', 'skills.txt'), ' ', part('t-out', '…')]); scrollTo('#skills'); },
+    certs: () => { appendRow([part('t-out', 'enumerating'), ' ', part('t-path', 'certifications/'), ' ', part('t-out', '…')]); scrollTo('#certs'); },
     certifications: () => COMMANDS.certs(),
-    contact: () => { print(`<span class="t-out">init</span> <span class="t-path">contact.sh</span> <span class="t-out">…</span>`); scrollTo('#contact'); },
-    resume: () => { print(`<span class="t-key">↓</span> <span class="t-out">downloading</span> Shawheen_Azimi_Resume.pdf`); const a = document.createElement('a'); a.href = 'Shawheen Azimi - Resume.pdf'; a.download = 'Shawheen Azimi - Resume.pdf'; a.click(); },
-    blog: () => { print(`<span class="t-out">opening</span> <span class="t-path">shavvheens-newsletter.beehiiv.com</span> <span class="t-out">…</span>`); window.open('https://shavvheens-newsletter.beehiiv.com/', '_blank', 'noopener'); },
-    clearance: () => print(`<span class="t-out">Department of War cleared.</span>`),
-    sudo: () => print(`<span class="t-warn">shawheen is not in the sudoers file. This incident will be reported.</span> 🛡️`),
-    hire: () => { print(`<span class="t-key">smart move.</span> <span class="t-out">routing to contact …</span>`); scrollTo('#contact'); },
+    contact: () => { appendRow([part('t-out', 'init'), ' ', part('t-path', 'contact.sh'), ' ', part('t-out', '…')]); scrollTo('#contact'); },
+    resume: () => { appendRow([part('t-key', '↓'), ' ', part('t-out', 'downloading'), ' Shawheen_Azimi_Resume.pdf']); const a = document.createElement('a'); a.href = 'Shawheen Azimi - Resume.pdf'; a.download = 'Shawheen Azimi - Resume.pdf'; a.click(); },
+    blog: () => { appendRow([part('t-out', 'opening'), ' ', part('t-path', 'shavvheens-newsletter.beehiiv.com'), ' ', part('t-out', '…')]); window.open('https://shavvheens-newsletter.beehiiv.com/', '_blank', 'noopener'); },
+    clearance: () => appendRow([part('t-out', 'Department of War cleared.')]),
+    sudo: () => appendRow([part('t-warn', 'shawheen is not in the sudoers file. This incident will be reported.')]),
+    hire: () => { appendRow([part('t-key', 'smart move.'), ' ', part('t-out', 'routing to contact …')]); scrollTo('#contact'); },
     clear: () => { $$('.t-row:not(.boot)', body).forEach(n => { if (!n.classList.contains('t-live')) n.remove(); }); },
   };
 
   const run = (raw) => {
-    const cmd = raw.trim().toLowerCase();
+    const clean = raw.trim().slice(0, 160);
+    const cmd = clean.toLowerCase();
     if (!cmd) return;
-    echo(raw.trim());
+    echo(clean);
     const fn = COMMANDS[cmd] || COMMANDS[cmd.split(' ')[0]];
     if (fn) fn();
-    else print(`<span class="t-out">command not found:</span> <span class="t-warn">${escapeHTML(raw.trim())}</span> <span class="t-out">— try</span> <span class="t-key">help</span>`);
+    else appendRow([part('t-out', 'command not found:'), ' ', part('t-warn', clean), ' ', part('t-out', '— try'), ' ', part('t-key', 'help')]);
   };
 
   input.addEventListener('keydown', (e) => {
@@ -131,21 +147,17 @@
 
   /* ---------- boot sequence ---------- */
   const boot = [
-    { h: `<span class="t-out">// initializing secure session …</span>`, d: 200 },
-    { h: `<span class="t-prompt">shawheen@ai</span><span class="t-out">:</span><span class="t-path">~</span><span class="t-out">$</span> <span class="t-cmd">whoami</span>`, d: 500 },
-    { h: `<span class="t-key">Shawheen Azimi</span>`, d: 300 },
-    { h: `<span class="t-out">Senior Security Architect · Engineer · Analyst</span>`, d: 250 },
-    { h: `<span class="t-out">type</span> <span class="t-key">help</span> <span class="t-out">to explore ↓</span>`, d: 200 },
+    { parts: [part('t-out', '// initializing secure session …')], d: 200 },
+    { parts: promptParts('whoami'), d: 500 },
+    { parts: [part('t-key', 'Shawheen Azimi')], d: 300 },
+    { parts: [part('t-out', 'Senior Security Architect · Engineer · Analyst')], d: 250 },
+    { parts: [part('t-out', 'type'), ' ', part('t-key', 'help'), ' ', part('t-out', 'to explore ↓')], d: 200 },
   ];
   let bi = 0;
   const runBoot = () => {
     if (bi >= boot.length) return;
     const line = boot[bi++];
-    const d = document.createElement('div');
-    d.className = 't-row boot';
-    d.innerHTML = line.h;
-    body.insertBefore(d, body.querySelector('.t-live'));
-    body.scrollTop = body.scrollHeight;
+    appendRow(line.parts, 'boot');
     setTimeout(runBoot, reduce ? 0 : line.d);
   };
   runBoot();
