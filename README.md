@@ -4,7 +4,7 @@ Public portfolio site for Shawheen Azimi, a senior security engineer focused on 
 
 ## Live Site
 
-https://shawheen1904.github.io/Personal-Website/
+https://shawheen1904.github.io/shawheen-azimi-portfolio/
 
 ## About
 
