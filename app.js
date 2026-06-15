@@ -68,6 +68,13 @@
   if (!body || !input) return;
 
   const FILES = ['about.md', 'experience.json', 'skills.txt', 'certifications/', 'resume.pdf', 'blog.url', 'contact.sh'];
+  const escapeHTML = (value) => value.replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  }[ch]));
   const print = (html, cls) => {
     const d = document.createElement('div');
     d.className = 't-row' + (cls ? ' ' + cls : '');
@@ -75,7 +82,7 @@
     body.insertBefore(d, body.querySelector('.t-live'));
     body.scrollTop = body.scrollHeight;
   };
-  const echo = (cmd) => print(`<span class="t-prompt">shawheen@ai</span><span class="t-out">:</span><span class="t-path">~</span><span class="t-out">$</span> <span class="t-cmd">${cmd}</span>`);
+  const echo = (cmd) => print(`<span class="t-prompt">shawheen@ai</span><span class="t-out">:</span><span class="t-path">~</span><span class="t-out">$</span> <span class="t-cmd">${escapeHTML(cmd)}</span>`);
 
   const scrollTo = (id) => { const el = $(id); if (el) el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); };
 
@@ -113,7 +120,7 @@
     echo(raw.trim());
     const fn = COMMANDS[cmd] || COMMANDS[cmd.split(' ')[0]];
     if (fn) fn();
-    else print(`<span class="t-out">command not found:</span> <span class="t-warn">${raw.trim()}</span> <span class="t-out">— try</span> <span class="t-key">help</span>`);
+    else print(`<span class="t-out">command not found:</span> <span class="t-warn">${escapeHTML(raw.trim())}</span> <span class="t-out">— try</span> <span class="t-key">help</span>`);
   };
 
   input.addEventListener('keydown', (e) => {
