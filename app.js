@@ -97,7 +97,7 @@
 
   const scrollTo = (id) => { const el = $(id); if (el) el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); };
 
-  const COMMANDS = {
+  const COMMANDS = Object.freeze({
     help: () => appendRow([
       part('t-out', 'available commands:'),
       '\n  ', part('t-key', 'about'), '       whoami / background',
@@ -127,15 +127,15 @@
     sudo: () => appendRow([part('t-warn', 'shawheen is not in the sudoers file. This incident will be reported.')]),
     hire: () => { appendRow([part('t-key', 'smart move.'), ' ', part('t-out', 'routing to contact …')]); scrollTo('#contact'); },
     clear: () => { $$('.t-row:not(.boot)', body).forEach(n => { if (!n.classList.contains('t-live')) n.remove(); }); },
-  };
+  });
 
   const run = (raw) => {
     const clean = raw.trim().slice(0, 160);
     const cmd = clean.toLowerCase();
     if (!cmd) return;
     echo(clean);
-    const fn = COMMANDS[cmd] || COMMANDS[cmd.split(' ')[0]];
-    if (fn) fn();
+    const fn = Object.hasOwn(COMMANDS, cmd) ? COMMANDS[cmd] : null;
+    if (typeof fn === 'function') fn();
     else appendRow([part('t-out', 'command not found:'), ' ', part('t-warn', clean), ' ', part('t-out', '— try'), ' ', part('t-key', 'help')]);
   };
 
