@@ -123,7 +123,7 @@
     contact: () => { appendRow([part('t-out', 'init'), ' ', part('t-path', 'contact.sh'), ' ', part('t-out', '…')]); scrollTo('#contact'); },
     resume: () => { appendRow([part('t-key', '↓'), ' ', part('t-out', 'downloading'), ' Shawheen_Azimi_Resume.pdf']); const a = document.createElement('a'); a.href = 'Shawheen Azimi - Resume.pdf'; a.download = 'Shawheen Azimi - Resume.pdf'; a.click(); },
     blog: () => { appendRow([part('t-out', 'opening'), ' ', part('t-path', 'shavvheens-newsletter.beehiiv.com'), ' ', part('t-out', '…')]); window.open('https://shavvheens-newsletter.beehiiv.com/', '_blank', 'noopener'); },
-    clearance: () => appendRow([part('t-out', 'Department of War cleared.')]),
+    clearance: () => appendRow([part('t-out', 'Active clearance; details available upon request.')]),
     sudo: () => appendRow([part('t-warn', 'shawheen is not in the sudoers file. This incident will be reported.')]),
     hire: () => { appendRow([part('t-key', 'smart move.'), ' ', part('t-out', 'routing to contact …')]); scrollTo('#contact'); },
     clear: () => { $$('.t-row:not(.boot)', body).forEach(n => { if (!n.classList.contains('t-live')) n.remove(); }); },
