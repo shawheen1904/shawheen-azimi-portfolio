@@ -67,7 +67,7 @@
   const input = $('#term-input');
   if (!body || !input) return;
 
-  const FILES = ['about.md', 'experience.json', 'skills.txt', 'certifications/', 'resume.pdf', 'blog.url', 'contact.sh'];
+  const FILES = ['about.md', 'experience.json', 'projects/', 'skills.txt', 'certifications/', 'resume.pdf', 'blog.url', 'contact.sh'];
   const appendRow = (parts, cls) => {
     const d = document.createElement('div');
     d.className = 't-row' + (cls ? ' ' + cls : '');
@@ -102,6 +102,7 @@
       part('t-out', 'available commands:'),
       '\n  ', part('t-key', 'about'), '       whoami / background',
       '\n  ', part('t-key', 'experience'), '  professional record',
+      '\n  ', part('t-key', 'projects'), '    selected builds',
       '\n  ', part('t-key', 'skills'), '      technical stack',
       '\n  ', part('t-key', 'certs'), '       certifications',
       '\n  ', part('t-key', 'resume'), '      download CV (pdf)',
@@ -117,6 +118,8 @@
     about: () => { appendRow([part('t-out', 'opening'), ' ', part('t-path', 'about.md'), ' ', part('t-out', '…')]); scrollTo('#about'); },
     experience: () => { appendRow([part('t-out', 'querying'), ' ', part('t-path', 'experience.json'), ' ', part('t-out', '…')]); scrollTo('#experience'); },
     exp: () => COMMANDS.experience(),
+    projects: () => { appendRow([part('t-out', 'opening'), ' ', part('t-path', 'projects/'), ' ', part('t-out', '…')]); scrollTo('#projects'); },
+    project: () => COMMANDS.projects(),
     skills: () => { appendRow([part('t-out', 'loading'), ' ', part('t-path', 'skills.txt'), ' ', part('t-out', '…')]); scrollTo('#skills'); },
     certs: () => { appendRow([part('t-out', 'enumerating'), ' ', part('t-path', 'certifications/'), ' ', part('t-out', '…')]); scrollTo('#certs'); },
     certifications: () => COMMANDS.certs(),
